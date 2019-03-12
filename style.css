@@ -19,7 +19,7 @@ body{
   text-transform: uppercase;
   font-weight: 500;
 }
-.box input[type = "text"],.box input[type = "password"]{
+.box input[type = "text"],.box input[type = "password"],.box input[type = "mail"]{
   border:0;
   background: none;
   display: block;
@@ -54,3 +54,5 @@ body{
 .box input[type = "submit"]:hover{
   background: #2ecc71;
 }
+
+

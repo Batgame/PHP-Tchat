@@ -1,28 +1,34 @@
 <?php
 session_start();
 
-$bdd = new PDO('mysql:host=127.0.0.1;dbname=membres', 'root', '');
+try {
+    $bdd = new PDO('mysql:host=127.0.0.1;dbname=tchat', 'root', 'aaazzz42');
+}
+catch (PDOException $e){
+    echo $e->getMessage();
+}
+
 
 if(isset($_POST['formconnexion']))
 {
-  $mailconnect = htmlspecialchars($_POST['mailconnect']);
+  $pseudoconnect = htmlspecialchars($_POST['pseudoconnect']);
   $mdpconnect = sha1($_POST['mdpconnect']);
-  if(!empty($mailconnect) AND !empty($mdpconnect))
+  if(!empty($pseudoconnect) AND !empty($mdpconnect))
   {
-    $requser = $bdd->prepare('SELECT * FROM membres WHERE mail = ? AND mdp = ?')
-    $requser->execute(array($mailconnect, $mdpconnect))
+    $requser = $bdd->prepare('SELECT * FROM membres WHERE pseudo = ? AND mdp = ?');
+    $requser->execute(array($pseudoconnect, $mdpconnect));
     $userexist = $requser-> rowCount();
     if($userexist == 1)
     {
       $userinfo = $requser->fetch();
       $_SESSION['id'] = $userinfo['id'];
       $_SESSION['pseudo'] = $userinfo['pseudo'];
-      $_SESSION['mail'] = $userinfo['mail'];
-      header("Location: profil.php?id=".$_SESSION['id']);
+      $_SESSION['email'] = $userinfo['email'];
+      header("Location: home.php");
     }
     else 
     {
-      $erreur = 'Mauvais identifiant ou mot de passe !'
+      $erreur = 'Mauvais identifiant ou mot de passe !';
     }
 
   }
@@ -33,12 +39,7 @@ if(isset($_POST['formconnexion']))
 
 
 
-
 }
-
-
-
-
 
 ?>
 <!DOCTYPE html>
@@ -47,14 +48,26 @@ if(isset($_POST['formconnexion']))
     <meta charset="utf-8">
     <title>َLogin Page</title>
     <link rel="stylesheet" href="style.css">
+
   </head>
   <body>
 
-<form class="box" action="index.html" method="post">
+<form class="box" action="index.php" method="post">
   <h1>Login</h1>
-  <input type="text" name="mailconnect" placeholder="Username">
+  <input type="text" name="pseudoconnect" placeholder="Username">
   <input type="password" name="mdpconnect" placeholder="Password">
   <input type="submit" name="formconnexion" value="Login">
+  <meta name="viewport" content="width=device-width, maximum-scale=1"/>
+
+  <p style="color: #e74c3c">Pas encore membre? Inscrivez-vous <a href='inscription.php'>ici</a></p> 
+
+  <?php 
+  if(isset($erreur))
+  {
+    echo '<font color="red">'.$erreur.'</>';
+  }
+
+  ?>
 </form>
 
 
