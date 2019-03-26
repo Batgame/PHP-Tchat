@@ -11,18 +11,31 @@ catch (PDOException $e){
 if (isset($_SESSION)) 
 {
 	if(!empty($_SESSION))
-	{
-    	$reqdesti = $bdd->prepare('SELECT pseudo FROM membres');
-    	$reqdesti->execute;
-    	$pseudoexist = $reqdesti->rowCount();
+  {
+    if(isset($_POST['envoi_msg']))
+    {
+      if(isset($_POST['destinataire'], $_POST['message']))
+      {
+        if(!empty($_POST['destinataire']) AND !empty($_POST['message']))
+        { 
+          $destinataire = htmlspecialchars($_POST['destinataire']);
+          $message = htmlspecialchars($_POST['message']);
+          $ins_msg = $bdd->prepare('INSERT INTO messages (destinataire, expediteur, message, lu) VALUES (?, ?, ?, ?)');
+          $ins_msg->execute(array($destinataire, $_SESSION['pseudo'], $message, '0'));
+          $erreur = 'Votre message a bien été envoyé !'; 
 
+        }else{
+        $erreur = 'Veuillez compléter tous les champs !';
+      }
     }
- 	else
+  }
+  }else
 	{
 		header('Location: index.php');
 	}
-}
+} 
 
+$destinataire = $bdd->query('SELECT pseudo FROM membres ORDER BY pseudo');
 
 ?>
 <!doctype html>
@@ -76,30 +89,17 @@ if (isset($_SESSION))
   <main role="main" class="inner cover">
     <h1 class="cover-heading">Boite d'envoi</h1><br />
     <p class="lead" align="left"></p>
-    <?php 
-
-    if($pseudoexist = 0)
-    {
-    	echo "Aucun membres inscrit !";
-    }
-    while($pseudo = $reqdesti->fetch())
-    {
-    	$destinataire = $reqdesti['pseudo'];
-    }
-
-
-
-    ?>
+    <form method="POST" action="envoi.php"> 
     <label for="destinataire">Destinataire:</label>
-    <select id="destinataire">
-	  <option value="">
-	  	
-	  </option>
-	</select><br />
-    <textarea placeholder="Entrer votre message..." rows="6" cols="50"></textarea>
+    <select name="destinataire">
+       <?php while($d = $destinataire->fetch()) { ?> 
+  	  <option value="<?= $d['pseudo'] ?>" ><?= $d['pseudo']?></option>
+      <?php } ?>
+  	</select><br />
+      <textarea placeholder="Entrer votre message..." rows="6" cols="50" name="message"></textarea>
       
     <p class="lead">
-      <a href="#" class="btn btn-lg btn-secondary">Envoyer</a>  
+      <input type="submit" name="envoi_msg" value="Envoyer"><br />
       <?php
       if(isset($erreur))
       {
@@ -107,6 +107,7 @@ if (isset($_SESSION))
       }
       ?>        
     </p>
+    </form>
   </main>
 
   <footer class="mastfoot mt-auto">
