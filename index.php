@@ -2,7 +2,7 @@
 session_start();
 
 try {
-    $bdd = new PDO('mysql:host=127.0.0.1;dbname=tchat', 'root', 'aaazzz42');
+    $bdd = new PDO('mysql:host=127.0.0.1;dbname=tchat', 'root', '*****');
 }
 catch (PDOException $e){
     echo $e->getMessage();
